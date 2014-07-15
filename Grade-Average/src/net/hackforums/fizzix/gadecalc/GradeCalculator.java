@@ -1,58 +1,66 @@
-package net.hackforums.fizzix.gradecalc.prompt.impl;
+package net.hackforums.fizzix.gradecalc;
 
 import java.util.Scanner;
 
+import net.hackforums.fizzix.gradecalc.gradescale.GradeFinder;
 import net.hackforums.fizzix.gradecalc.prompt.Prompt;
+import net.hackforums.fizzix.gradecalc.prompt.impl.AverageResultPrompt;
+import net.hackforums.fizzix.gradecalc.prompt.impl.RequestGradePrompt;
+import net.hackforums.fizzix.gradecalc.prompt.impl.WelcomePrompt;
 
 /**
- * Simply prompts the user for an int, via the system input stream, after
- * displaying what to input via the system output stream.
+ * Calculates the average of 8 grades.
  * 
  * @author Fizzix
  *
  */
-public class RequestGradePrompt implements Prompt<Integer> {
+public class GradeCalculator {
 
 	/**
-	 * The number that is displayed to the user indicating which grade this
-	 * prompt corresponds to.
+	 * This is only needed because creating multiple scanners with System.in can
+	 * get a bit buggy on some OSes.
 	 */
-	private int number;
+	private static Scanner input = new Scanner(System.in);
 
-	private Scanner input;
+	public static void main(String[] args) {
+		// Display the welcome prompt
+		new WelcomePrompt().display();
 
-	/**
-	 * Creates a prompt that first asks the user to input a grade corresponding
-	 * the the given number, then receives input and parses it.
-	 * 
-	 * @param in
-	 *            The scanner that will be used to read input.
-	 * @param number
-	 *            The number that corresponds to the grade that should be
-	 *            provided.
-	 */
-	public RequestGradePrompt(Scanner in, int number) {
-		this.input = in;
-		this.number = number;
-	}
+		// Keeps track of the sum of grades
+		int sum = 0;
 
-	@Override
-	public Integer display() {
-		// Ask for the grade
-		System.out.println("Please insert grade #" + number + ":");
-
-		// Get the input from the scanner
-		try {
-			String in = input.nextLine();
-			// Attempts to parse the input as an integer
-			return Integer.parseInt(in);
-		} catch (NumberFormatException e) {
-			// Tells the user their input was not accepted and to try again
-			System.out.println("Invalid input, try again.");
-			// Recursively calls this method; if the user is retarded they
-			// may cause a stack overflow
-			return display();
+		// Asks for grades 1-8 (inclusive) and adds them to sum
+		for (int i = 1; i <= 8; i++) {
+			sum += getGrade(i);
 		}
 
+		// Calculates the average of the 8 grades
+		int average = sum / 8;
+
+		// Gets the String representation of the averaged grade
+		String averagedGrade = new GradeFinder()
+				.getGradeRepresentation(average);
+
+		// Displays the averaged grade's string representation
+		new AverageResultPrompt(averagedGrade).display();
 	}
+
+	/**
+	 * Prompts the user for a grade, parses it, then returns the parsed
+	 * response.
+	 * 
+	 * @param i
+	 *            - The grade number to ask for in the prompt.
+	 */
+	private static int getGrade(int i) {
+		// Creates a new prompt to ask for and parse the grade
+		Prompt<Integer> current = new RequestGradePrompt(input, i);
+		// Displays the prompt, which returns the grade in boxed form
+		Integer result = current.display();
+
+		// The result is auto-unboxed, which is fine because it will never
+		// return null
+		return result;
+	}
+
 }
