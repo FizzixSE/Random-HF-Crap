@@ -19,15 +19,20 @@ public class RequestGradePrompt implements Prompt<Integer> {
 	 */
 	private int number;
 
+	private Scanner input;
+
 	/**
 	 * Creates a prompt that first asks the user to input a grade corresponding
 	 * the the given number, then receives input and parses it.
 	 * 
+	 * @param in
+	 *            The scanner that will be used to read input.
 	 * @param number
 	 *            The number that corresponds to the grade that should be
 	 *            provided.
 	 */
-	public RequestGradePrompt(int number) {
+	public RequestGradePrompt(Scanner in, int number) {
+		this.input = in;
 		this.number = number;
 	}
 
@@ -36,22 +41,18 @@ public class RequestGradePrompt implements Prompt<Integer> {
 		// Ask for the grade
 		System.out.println("Please insert grade #" + number + ":");
 
-		// Create a scanner and have it autoclose
-		try (Scanner in = new Scanner(System.in)) {
-			// Get the input from the scanner
-			String input = in.nextLine();
-			try {
-				// Attempts to parse the input as an integer
-				return Integer.parseInt(input);
-			} catch (NumberFormatException e) {
-				// Tells the user their input was not accepted and to try again
-				System.out.println("Invalid input, try again.");
-				// Recursively calls this method; if the user is retarded they
-				// may cause a stack overflow here
-				return display();
-			}
+		// Get the input from the scanner
+		try {
+			String in = input.nextLine();
+			// Attempts to parse the input as an integer
+			return Integer.parseInt(in);
+		} catch (NumberFormatException e) {
+			// Tells the user their input was not accepted and to try again
+			System.out.println("Invalid input, try again.");
+			// Recursively calls this method; if the user is retarded they
+			// may cause a stack overflow
+			return display();
 		}
-		// No catch block, as there isn't anything we can do about it and we'll
-		// just down the call stack to be handled at a higher level
+
 	}
 }
