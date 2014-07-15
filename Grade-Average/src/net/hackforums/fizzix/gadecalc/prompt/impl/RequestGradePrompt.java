@@ -19,6 +19,10 @@ public class RequestGradePrompt implements Prompt<Integer> {
 	 */
 	private int number;
 
+	/**
+	 * Only needed due to some issues certain OSes have with Scanner on
+	 * System.in.
+	 */
 	private Scanner input;
 
 	/**
@@ -41,8 +45,8 @@ public class RequestGradePrompt implements Prompt<Integer> {
 		// Ask for the grade
 		System.out.println("Please insert grade #" + number + ":");
 
-		// Get the input from the scanner
 		try {
+			// Get the input from the scanner
 			String in = input.nextLine();
 			// Attempts to parse the input as an integer
 			return Integer.parseInt(in);
